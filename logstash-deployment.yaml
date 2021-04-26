@@ -1,18 +1,24 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: logstash-deployment
   namespace: kube-system
+  labels:
+    k8s-app: logstash
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: logstash
   template:
     metadata:
       labels:
-        app: logstash
+        k8s-app: logstash
     spec:
       containers:
       - name: logstash
         image: docker.elastic.co/logstash/logstash:6.3.0
+        #image: docker.elastic.co/logstash/logstash:7.12.0
         ports:
         - containerPort: 5044
         volumeMounts:
@@ -33,15 +39,4 @@ spec:
           items:
             - key: logstash.conf
               path: logstash.conf
-kind: Service
-apiVersion: v1
-metadata:
-  name: logstash-service
-  namespace: kube-system
-spec:
-  selector:
-    app: logstash
-  ports:
-  - protocol: TCP
-    port: 5044
-    targetPort: 5044            
+
